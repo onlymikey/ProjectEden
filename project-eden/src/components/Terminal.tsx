@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function MacOSTerminal() {
   const [lines, setLines] = useState<string[]>(["Loading valentines gift..."]);
@@ -7,6 +7,8 @@ export default function MacOSTerminal() {
   const [currentChar, setCurrentChar] = useState<number>(0); // Índice del carácter actual
   const [isInitialDelay, setIsInitialDelay] = useState<boolean>(true); // Para manejar el retraso inicial
   const [isCooldown, setIsCooldown] = useState<boolean>(false); // Para manejar el cooldown entre líneas
+  const [showContinueButton, setShowContinueButton] = useState<boolean>(false); // Mostrar botón de "Continue"
+  const [fadeOut, setFadeOut] = useState<boolean>(false); // Manejar el desvanecimiento
 
   useEffect(() => {
     const messages = [
@@ -27,66 +29,92 @@ export default function MacOSTerminal() {
     ];
 
     const typeCharacter = () => {
-      if (isCooldown) return; // Si está en cooldown, no hacer nada
+      if (isCooldown) return;
 
       const currentMessage = messages[currentLine] || ""; // Mensaje actual
       if (currentChar < currentMessage.length) {
-        // Añadir el siguiente carácter al estado
         setLines((prevLines) => {
           const updatedLines = [...prevLines];
-          if (!updatedLines[currentLine]) updatedLines[currentLine] = ""; // Inicializar la línea si no existe
+          if (!updatedLines[currentLine]) updatedLines[currentLine] = ""; // Inicializar línea si no existe
           updatedLines[currentLine] += currentMessage[currentChar];
           return updatedLines;
         });
-        setCurrentChar((prev) => prev + 1); // Avanzar al siguiente carácter
+        setCurrentChar((prev) => prev + 1);
       } else if (currentLine < messages.length - 1) {
-        // Cooldown de 2 segundos antes de pasar a la siguiente línea
         setIsCooldown(true);
         setTimeout(() => {
           setIsCooldown(false);
-          setCurrentLine((prev) => prev + 1); // Avanzar a la siguiente línea
-          setCurrentChar(0); // Reiniciar índice de caracteres
+          setCurrentLine((prev) => prev + 1);
+          setCurrentChar(0);
         }, 2000); // Cooldown de 2 segundos
       }
     };
 
-    // Manejar el retraso inicial antes de comenzar la animación
     if (isInitialDelay) {
       const delayTimer = setTimeout(() => {
-        setLines((prev) => [...prev, ""]); // Insertar una línea vacía para el salto de línea
-        setIsInitialDelay(false); // Desactivar el retraso inicial
-      }, 2000); // Espera de 2 segundos
+        setLines((prev) => [...prev, ""]);
+        setIsInitialDelay(false);
+      }, 2000);
       return () => clearTimeout(delayTimer);
     }
 
     const interval = setInterval(typeCharacter, 50); // 50 ms por carácter
-    return () => clearInterval(interval); // Limpiar intervalo al desmontar
+    return () => clearInterval(interval);
   }, [currentChar, currentLine, isInitialDelay, isCooldown]);
 
-  return (
-    <motion.div
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.5 }}
-      className="w-[600px] rounded-lg shadow-xl bg-gray-800 overflow-hidden border border-gray-700"
-    >
-      {/* Barra de título */}
-      <div className="bg-gray-800 px-4 py-2 flex items-center">
-        <div className="flex space-x-2 flex-1">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
-        <div className="text-sm text-gray-400">Happy Valentines Day &lt;3! </div>
-        <div className="flex-1"></div>
-      </div>
+  // Mostrar el botón "Continue" después de 120 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowContinueButton(true);
+    }, 80000);
+    return () => clearTimeout(timer);
+  }, []);
 
-      {/* Área de la terminal */}
-      <div className="p-4 overflow-y-auto font-mono text-sm text-green-400 bg-gray-900 h-auto">
-        {lines.map((line, index) => (
-          <div key={index}>{line}</div>
-        ))}
-      </div>
-    </motion.div>
+  const handleContinue = () => {
+    setFadeOut(true); // Iniciar desvanecimiento
+  };
+
+  return (
+    <AnimatePresence>
+      {!fadeOut && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-[600px] rounded-lg shadow-xl bg-gray-800 overflow-hidden border border-gray-700"
+        >
+          {/* Barra de título */}
+          <div className="bg-gray-800 px-4 py-2 flex items-center">
+            <div className="flex space-x-2 flex-1">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <div className="text-sm text-gray-400">Happy Valentines Day &lt;3! </div>
+            <div className="flex-1"></div>
+          </div>
+
+          {/* Área de la terminal */}
+          <div className="p-4 overflow-y-auto font-mono text-sm text-green-400 bg-gray-900 h-auto">
+            {lines.map((line, index) => (
+              <div key={index}>{line}</div>
+            ))}
+          </div>
+
+          {/* Botón "Continue" */}
+          {showContinueButton && (
+            <div className="p-4 flex justify-center bg-gray-800">
+              <button
+                onClick={handleContinue}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              >
+                Continue
+              </button>
+            </div>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
