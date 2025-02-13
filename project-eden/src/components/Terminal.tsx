@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function MacOSTerminal() {
+export default function MacOSTerminal({ onComplete }: { onComplete: () => void }) {
   const [lines, setLines] = useState<string[]>(["Loading valentines gift..."]);
   const [currentLine, setCurrentLine] = useState<number>(0); // Índice de la línea actual
   const [currentChar, setCurrentChar] = useState<number>(0); // Índice del carácter actual
@@ -62,16 +62,19 @@ export default function MacOSTerminal() {
     return () => clearInterval(interval);
   }, [currentChar, currentLine, isInitialDelay, isCooldown]);
 
-  // Mostrar el botón "Continue" después de 120 segundos
+  // Mostrar el botón "Continue" después de 80 segundos
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowContinueButton(true);
-    }, 80000);
+    }, 80000); // 80 segundos
     return () => clearTimeout(timer);
   }, []);
 
   const handleContinue = () => {
     setFadeOut(true); // Iniciar desvanecimiento
+    setTimeout(() => {
+      onComplete(); // Notificar que el componente ha terminado
+    }, 500); // Duración del desvanecimiento
   };
 
   return (
