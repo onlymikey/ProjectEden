@@ -7,12 +7,12 @@ interface SecurityQuestionProps {
 }
 
 const SecurityQuestion = ({ onComplete }: SecurityQuestionProps) => {
-  const question = "¿Cuál es la banda favorita de Mikey?"
+  const question = "¿Cuál es la banda favorita de Diana?"
   const answers = [
-    { text: "Green Day", color: "#f60e04" },
-    { text: "Cuarteto de Nos", color: "#a6bbb9" },
+    { text: "BABYMETAL", color: "#f60e04" },
+    { text: "Deftones", color: "#456c93" },
     { text: "Weezer", color: "#008FC4" },
-    { text: "The Cranberries", color: "#835e4c" }
+    { text: "Bôa", color: "#d96b8d" }
   ]
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [fadeOut, setFadeOut] = useState<boolean>(false)
@@ -30,7 +30,7 @@ const SecurityQuestion = ({ onComplete }: SecurityQuestionProps) => {
   }, [fadeOut, onComplete])
 
   const handleAnswerClick = (answer: string, index: number) => {
-    if (answer === "Weezer") {
+    if (answer === "BABYMETAL") {
       setSelectedAnswer("¡Acertaste!")
       setButtonColors(prevColors => prevColors.map((color, i) => i === index ? "green" : color))
       setJump(true)
@@ -69,11 +69,11 @@ const SecurityQuestion = ({ onComplete }: SecurityQuestionProps) => {
             <h2 className="text-lg mb-4">Primero que nada una pregunta de seguridad.</h2>
             <h2 className="text-lg mb-4">{question}</h2>
           </Bubble>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 w-full max-w-md md:max-w-lg lg:max-w-xl">
+          <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-md md:max-w-lg lg:max-w-xl pr-4">
             {answers.map((answer, index) => (
               <Button
                 key={index}
-                className="w-3/4 mx-auto"
+                className="w-full"
                 bg={buttonColors[index]}
                 textColor="white"
                 borderColor="#2D2D30"
